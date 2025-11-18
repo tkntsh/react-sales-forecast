@@ -4,6 +4,55 @@ import SalesChart from '../components/SalesChart';
 import MetricsCard from '../components/MetricsCard';
 import { API_URL } from '../config';
 
+export default function Home() {
+  const [predictions, setPredictions] = useState([]);
+  const [summary, setSummary] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [predRes, sumRes] = await Promise.all([
+          fetch(`${API_URL}/api/predictions`),
+          fetch(`${API_URL}/api/summary`)
+        ]);
+
+        if (!predRes.ok || !sumRes.ok) throw new Error('Failed to load data');
+
+        const predData = await predRes.json();
+        const sumData = await sumRes.json();
+        
+        // Check for error responses
+        if (predData.error) {
+          throw new Error(`Predictions: ${predData.error}`);
+        }
+        if (sumData.error) {
+          throw new Error(`Summary: ${sumData.error}`);
+        }
+        
+        // Ensure predictions is an array
+        if (!Array.isArray(predData)) {
+          throw new Error('Invalid predictions data format');
+        }
+
+        setPredictions(predData);
+        setSummary(sumData);
+      } catch (err) {
+        setError(err.message);
+        console.error("Fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
       </div>
     );
   }

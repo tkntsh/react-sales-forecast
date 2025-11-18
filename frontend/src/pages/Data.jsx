@@ -4,6 +4,45 @@ import { API_URL } from '../config';
 
 export default function Data() {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 50;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/clean-data`);
+        if (!res.ok) throw new Error('Failed to load data');
+        const jsonData = await res.json();
+        
+        // Check if response is an error object
+        if (jsonData.error) {
+          throw new Error(jsonData.error);
+        }
+        
+        // Ensure we have an array
+        if (!Array.isArray(jsonData)) {
+          throw new Error('Invalid data format received');
+        }
+        
+        setData(jsonData);
+      } catch (err) {
+        setError(err.message);
+        console.error("Fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Filter data based on search term
+  const filteredData = data.filter(row =>
+    Object.values(row).some(val =>
+      String(val).toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
 
