@@ -1,30 +1,6 @@
 # backend/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-import pandas as pd
-import os
-
-app = FastAPI(title="Walmart Sales Forecast API")
-
-# === CORS: ALLOW FRONTEND ===
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",  # Local development
-        "https://*.vercel.app",   # Vercel preview deployments  
-        "https://react-sales-forecast.vercel.app"  # Production (update with your actual URL)
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-# ===========================
-
-@app.get("/")
-async def root():
-    return {"message": "Walmart Forecast API is running!"}
-
 @app.get("/api/predictions")
 async def get_predictions():
     file_path = "../forecasting/data/predictions.csv"
