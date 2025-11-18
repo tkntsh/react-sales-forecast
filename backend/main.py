@@ -10,7 +10,11 @@ app = FastAPI(title="Walmart Sales Forecast API")
 # === CORS: ALLOW FRONTEND ===
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # VITE DEV SERVER
+    allow_origins=[
+        "http://localhost:5173",  # Local development
+        "https://*.vercel.app",   # Vercel preview deployments  
+        "https://react-sales-forecast.vercel.app"  # Production (update with your actual URL)
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
