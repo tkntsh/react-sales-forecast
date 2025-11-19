@@ -1,25 +1,26 @@
 # backend/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-@app.get("/api/predictions")
-async def get_predictions():
-    file_path = "data/predictions.csv"
-    if not os.path.exists(file_path):
-        return {"error": "predictions.csv not found"}
-    df = pd.read_csv(file_path)
-    return df.to_dict(orient="records")
+from fastapi.responses import FileResponse
+import pandas as pd
+import os
 
-@app.get("/api/summary")
-async def get_summary():
-    file_path = "data/clean_data.csv"
-    if not os.path.exists(file_path):
-        return {"error": "clean_data.csv not found"}
-    df = pd.read_csv(file_path)
-    return {
-        "total_stores": int(df['Store'].nunique()),
-# backend/main.py
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+app = FastAPI(title="Walmart Sales Forecast API")
+
+# === CORS: ALLOW FRONTEND ===
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+# ===========================
+
+@app.get("/")
+async def root():
+    return {"message": "Walmart Forecast API is running!"}
+
 @app.get("/api/predictions")
 async def get_predictions():
     file_path = "data/predictions.csv"
@@ -48,7 +49,7 @@ async def get_clean_data():
     if not os.path.exists(file_path):
         return {"error": "clean_data.csv not found"}
     df = pd.read_csv(file_path)
-    # Return first 100 rows to avoid performance issues
+    # Return first 100 rows for better performance
     return df.head(100).to_dict(orient="records")
 
 @app.get("/images/metric.png")
